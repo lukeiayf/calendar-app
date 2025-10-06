@@ -24,7 +24,7 @@
         v-for="date in daysInMonth"
         :key="date"
         class="calendar-day calendar-day-large"
-        :class="{ today: isToday(date) }"
+        :class="{ today: isToday(date), weekend: isWeekend(date) }"
       >
         <div class="calendar-day-top">
           <span class="day-number">{{ date }}</span>
@@ -121,6 +121,11 @@ function isToday(date: number): boolean {
     currentMonth.value === today.getMonth() &&
     currentYear.value === today.getFullYear()
   )
+}
+
+function isWeekend(date: number): boolean {
+  const dayOfWeek = new Date(currentYear.value, currentMonth.value, date).getDay();
+  return dayOfWeek === 0 || dayOfWeek === 6;
 }
 
 function prevMonth(): void {
@@ -309,6 +314,15 @@ function allRemindersForDay(day: number): IReminder[] {
   border-color: #667eea;
   box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
 }
+
+.calendar-day.weekend {
+  background: lightgray;
+  color: #ffffff;
+  font-weight: 600;
+  border-color: lightgray;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
 
 .calendar-day.today .day-number {
   color: #ffffff;
