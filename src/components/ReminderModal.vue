@@ -82,14 +82,17 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { PropType } from 'vue';
+import type { IReminder } from '../interfaces/IReminder';
+
 defineProps({
   show: {
     type: Boolean,
     default: false,
   },
   editingReminder: {
-    type: Object,
+    type: Object as PropType<IReminder>,
     default: null,
   },
   overflowDay: {
@@ -97,7 +100,7 @@ defineProps({
     default: null,
   },
   allReminders: {
-    type: Array,
+    type: Array as PropType<IReminder[]>,
     default: () => [],
   },
 })
