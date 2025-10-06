@@ -2,15 +2,11 @@
   <div class="calendar">
     <div class="calendar-header">
       <button @click="prevMonth" class="nav-btn" aria-label="Previous Month">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
+        <
       </button>
       <h2 class="calendar-title">{{ monthYear }}</h2>
       <button @click="nextMonth" class="nav-btn" aria-label="Next Month">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
+        >
       </button>
     </div>
     <div class="calendar-grid">
@@ -31,10 +27,7 @@
         <div class="calendar-day-top">
           <span class="day-number">{{ date }}</span>
           <button class="add-reminder-btn" @click="openAddReminder(date)" title="Add reminder">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
+            +
           </button>
         </div>
         <div class="reminders-list">
