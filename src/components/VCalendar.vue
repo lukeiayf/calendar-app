@@ -56,97 +56,22 @@
     </div>
 
     <!-- Reminder Modal -->
-    <div v-if="showReminderModal" class="modal-overlay" @click.self="showReminderModal = false">
-      <div class="modal">
-        <template v-if="editingReminder">
-          <h3>{{ editingReminder.id ? 'Edit Reminder' : 'Add New Reminder' }}</h3>
-          <form @submit.prevent="saveReminder">
-            <div class="form-group">
-              <label for="reminder-time">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                Time
-              </label>
-              <input id="reminder-time" type="time" v-model="editingReminder.time" required />
-            </div>
-            <div class="form-group">
-              <label for="reminder-city">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-                City
-              </label>
-              <input id="reminder-city" type="text" v-model="editingReminder.city" required placeholder="Enter city name" />
-            </div>
-            <div class="form-group">
-              <label for="reminder-color">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                </svg>
-                Color
-              </label>
-              <input id="reminder-color" type="color" v-model="editingReminder.color" />
-            </div>
-            <div class="form-group">
-              <label for="reminder-text">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-                Description
-              </label>
-              <input id="reminder-text" type="text" v-model="editingReminder.text" required maxlength="50" placeholder="What's this reminder about?" />
-            </div>
-            <div class="modal-actions">
-              <button type="submit" class="btn-primary">
-                {{ editingReminder.id ? 'Update' : 'Save' }}
-              </button>
-              <button type="button" class="btn-secondary" @click="showReminderModal = false">Cancel</button>
-              <button
-                v-if="editingReminder.id"
-                type="button"
-                class="btn-danger"
-                @click="deleteReminder(editingReminder.id)"
-              >
-                Delete
-              </button>
-            </div>
-          </form>
-        </template>
-        <template v-else>
-          <h3>All Reminders - Day {{ overflowDay }}</h3>
-          <div class="reminders-modal-list">
-            <div
-              v-for="reminder in allRemindersForDay(overflowDay)"
-              :key="reminder.id"
-              class="reminder reminder-modal"
-              :style="{ background: reminder.color }"
-              @click="openEditReminder(reminder)"
-            >
-              <div class="reminder-header">
-                <span class="reminder-time">{{ reminder.time }}</span>
-                <span class="reminder-city">{{ reminder.city }}</span>
-              </div>
-              <div class="reminder-text">{{ reminder.text }}</div>
-            </div>
-          </div>
-          <div class="modal-actions">
-            <button type="button" class="btn-secondary" @click="showReminderModal = false">Close</button>
-          </div>
-        </template>
-      </div>
-    </div>
+    <ReminderModal
+      :show="showReminderModal"
+      :editingReminder="editingReminder"
+      :overflowDay="overflowDay"
+      :allReminders="overflowDay ? allRemindersForDay(overflowDay) : []"
+      @close="showReminderModal = false"
+      @save="saveReminder"
+      @delete="deleteReminder"
+      @edit-reminder="openEditReminder"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import ReminderModal from './ReminderModal.vue'
 
 const today = new Date()
 const currentMonth = ref(today.getMonth())
@@ -500,60 +425,7 @@ function allRemindersForDay(day) {
   transform: translateY(-1px);
 }
 
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.modal {
-  background: #ffffff;
-  padding: 2.5rem;
-  border-radius: 16px;
-  min-width: 420px;
-  max-width: 90vw;
-  max-height: 85vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.modal h3 {
-  margin: 0 0 1.5rem 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f2937;
-}
+/* Modal styles moved to ReminderModal.vue */
 
 /* Form Groups */
 .form-group {
