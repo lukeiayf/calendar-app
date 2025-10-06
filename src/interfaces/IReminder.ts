@@ -1,7 +1,10 @@
 export interface IReminder {
-    id: string;
+    id: number;
+    date: string;
+    time: string;
     city: string;
     color: string;
     text: string;
-    time: string;
 }
+
+export type IReminderDraft = Omit<IReminder, 'id'> & { id: number | null };

@@ -83,27 +83,22 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from 'vue';
-import type { IReminder } from '../interfaces/IReminder';
+import type { IReminder, IReminderDraft } from '../interfaces/IReminder'
 
-defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
-  editingReminder: {
-    type: Object as PropType<IReminder>,
-    default: null,
-  },
-  overflowDay: {
-    type: Number,
-    default: null,
-  },
-  allReminders: {
-    type: Array as PropType<IReminder[]>,
-    default: () => [],
-  },
-})
+withDefaults(
+  defineProps<{
+    show?: boolean
+    editingReminder?: IReminderDraft | IReminder | null
+    overflowDay?: number | null
+    allReminders?: IReminder[]
+  }>(),
+  {
+    show: false,
+    editingReminder: null,
+    overflowDay: null,
+    allReminders: () => [],
+  }
+)
 
 defineEmits(['close', 'save', 'delete', 'edit-reminder'])
 </script>

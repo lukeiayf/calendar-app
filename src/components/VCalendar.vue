@@ -1,5 +1,6 @@
 <template>
   <div class="calendar">
+    
     <div class="calendar-header">
       <button @click="prevMonth" class="nav-btn" aria-label="Previous Month">
         <
@@ -9,6 +10,7 @@
         >
       </button>
     </div>
+
     <div class="calendar-grid">
       <div class="calendar-day calendar-day-header" v-for="day in weekDays" :key="day">
         {{ day }}
@@ -69,30 +71,51 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
+<script setup lang="ts">
+import { ref, computed, type Ref } from 'vue'
 import ReminderModal from './ReminderModal.vue'
+import type { IReminder, IReminderDraft } from '../interfaces/IReminder'
 
 const today = new Date()
-const currentMonth = ref(today.getMonth())
-const currentYear = ref(today.getFullYear())
+const currentMonth = ref<number>(today.getMonth())
+const currentYear = ref<number>(today.getFullYear())
 
-const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const weekDays: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-const firstDayOfMonth = computed(() => new Date(currentYear.value, currentMonth.value, 1))
-const lastDayOfMonth = computed(() => new Date(currentYear.value, currentMonth.value + 1, 0))
+const firstDayOfMonth = computed<Date>(() => new Date(currentYear.value, currentMonth.value, 1))
+const lastDayOfMonth = computed<Date>(() => new Date(currentYear.value, currentMonth.value + 1, 0))
 
-const daysInMonth = computed(() =>
+const daysInMonth = computed<number[]>(() =>
   Array.from({ length: lastDayOfMonth.value.getDate() }, (_, i) => i + 1)
 )
 
-const blanks = computed(() => firstDayOfMonth.value.getDay())
+const blanks = computed<number>(() => firstDayOfMonth.value.getDay())
 
-const monthYear = computed(() =>
+const monthYear = computed<string>(() =>
   firstDayOfMonth.value.toLocaleString('default', { month: 'long', year: 'numeric' })
 )
 
-function isToday(date) {
+const reminders: Ref<IReminder[]> = ref([])
+
+const showReminderModal = ref<boolean>(false)
+const editingReminder = ref<IReminderDraft | null>(null)
+const selectedDay = ref<number | null>(null)
+const overflowDay = ref<number | null>(null)
+const MAX_VISIBLE_REMINDERS = 2
+
+const formatDate = (year: number, month: number, day: number): string =>
+  `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+
+const createIReminderDraft = (day: number): IReminderDraft => ({
+  id: null,
+  date: formatDate(currentYear.value, currentMonth.value, day),
+  time: '',
+  city: '',
+  color: '#667eea',
+  text: '',
+})
+
+function isToday(date: number): boolean {
   return (
     date === today.getDate() &&
     currentMonth.value === today.getMonth() &&
@@ -100,7 +123,7 @@ function isToday(date) {
   )
 }
 
-function prevMonth() {
+function prevMonth(): void {
   if (currentMonth.value === 0) {
     currentMonth.value = 11
     currentYear.value--
@@ -109,7 +132,7 @@ function prevMonth() {
   }
 }
 
-function nextMonth() {
+function nextMonth(): void {
   if (currentMonth.value === 11) {
     currentMonth.value = 0
     currentYear.value++
@@ -118,68 +141,62 @@ function nextMonth() {
   }
 }
 
-// Reminders state
-const reminders = ref([])
-// { id, date: 'YYYY-MM-DD', time: 'HH:mm', city, color, text }
-
-const showReminderModal = ref(false)
-const editingReminder = ref(null)
-const selectedDay = ref(null)
-const MAX_VISIBLE_REMINDERS = 2
-const overflowDay = ref(null)
-
-function openAddReminder(day) {
+function openAddReminder(day: number): void {
   selectedDay.value = day
-  editingReminder.value = {
-    id: null,
-    date: `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
-    time: '',
-    city: '',
-    color: '#667eea',
-    text: '',
-  }
+  editingReminder.value = createIReminderDraft(day)
   showReminderModal.value = true
 }
 
-function openEditReminder(reminder) {
+function openEditReminder(reminder: IReminder): void {
   editingReminder.value = { ...reminder }
   showReminderModal.value = true
 }
 
-function saveReminder() {
-  if (editingReminder.value.id) {
-    // Edit
-    const idx = reminders.value.findIndex(r => r.id === editingReminder.value.id)
-    if (idx !== -1) reminders.value[idx] = { ...editingReminder.value }
-  } else {
-    // Add
-    editingReminder.value.id = Date.now()
-    reminders.value.push({ ...editingReminder.value })
+function saveReminder(): void {
+  const draft = editingReminder.value
+  if (!draft) {
+    return
   }
+
+  const reminderToSave: IReminder = {
+    ...draft,
+    id: draft.id ?? Date.now(),
+  }
+
+  if (draft.id !== null) {
+    const idx = reminders.value.findIndex(r => r.id === draft.id)
+    if (idx !== -1) {
+      reminders.value[idx] = reminderToSave
+    }
+  } else {
+    reminders.value.push(reminderToSave)
+  }
+
+  editingReminder.value = null
   showReminderModal.value = false
 }
 
-function deleteReminder(id) {
+function deleteReminder(id: number): void {
   reminders.value = reminders.value.filter(r => r.id !== id)
   showReminderModal.value = false
 }
 
-function remindersForDay(day) {
-  const dateStr = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+function remindersForDay(day: number): IReminder[] {
+  const dateStr = formatDate(currentYear.value, currentMonth.value, day)
   return reminders.value
     .filter(r => r.date === dateStr)
     .sort((a, b) => a.time.localeCompare(b.time))
 }
 
-function showAllReminders(day) {
+function showAllReminders(day: number): void {
   overflowDay.value = day
   selectedDay.value = day
   showReminderModal.value = true
-  editingReminder.value = null // Not editing, just viewing all
+  editingReminder.value = null
 }
 
-function allRemindersForDay(day) {
-  const dateStr = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+function allRemindersForDay(day: number): IReminder[] {
+  const dateStr = formatDate(currentYear.value, currentMonth.value, day)
   return reminders.value
     .filter(r => r.date === dateStr)
     .sort((a, b) => a.time.localeCompare(b.time))
