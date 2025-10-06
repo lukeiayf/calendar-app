@@ -1,5 +1,4 @@
 <template>
-  <!-- Reminder Modal -->
   <div v-if="show" class="modal-overlay" @click.self="$emit('close')">
     <div class="modal">
       <template v-if="editingReminder">
@@ -7,34 +6,12 @@
         <form @submit.prevent="$emit('save')">
           <div class="form-group">
             <label for="reminder-time">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
               Time
             </label>
             <input id="reminder-time" type="time" v-model="editingReminder.time" required />
           </div>
           <div class="form-group">
             <label for="reminder-city">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
               City
             </label>
             <input
@@ -47,36 +24,12 @@
           </div>
           <div class="form-group">
             <label for="reminder-color">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-              </svg>
               Color
             </label>
             <input id="reminder-color" type="color" v-model="editingReminder.color" />
           </div>
           <div class="form-group">
             <label for="reminder-text">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
               Description
             </label>
             <input
@@ -153,7 +106,6 @@ defineEmits(['close', 'save', 'delete', 'edit-reminder'])
 </script>
 
 <style scoped>
-/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -208,7 +160,6 @@ defineEmits(['close', 'save', 'delete', 'edit-reminder'])
   color: #1f2937;
 }
 
-/* Form Groups */
 .form-group {
   margin-bottom: 1.5rem;
 }
@@ -363,7 +314,6 @@ defineEmits(['close', 'save', 'delete', 'edit-reminder'])
   margin: 0;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .modal {
     min-width: 90vw;
