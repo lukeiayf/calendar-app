@@ -1,23 +1,21 @@
 <template>
-    <div class="calendar-header">
-      <button @click="calendarStore.prevMonth()" class="nav-btn" aria-label="Previous Month">
-        <
-      </button>
-      <h2 class="calendar-title">{{ monthYear }}</h2>
-      <button @click="calendarStore.nextMonth()" class="nav-btn" aria-label="Next Month">
-        >
-      </button>
-    </div>
+  <div class="calendar-header">
+    <button @click="calendarStore.prevMonth()" class="nav-btn" aria-label="Previous Month">
+      <
+    </button>
+    <h2 class="calendar-title">{{ monthYear }}</h2>
+    <button @click="calendarStore.nextMonth()" class="nav-btn" aria-label="Next Month">></button>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useCalendarStore } from '../store/CalendarStore';
+import { computed } from 'vue'
+import { useCalendarStore } from '../store/CalendarStore'
 
 const calendarStore = useCalendarStore()
 
-const firstDayOfMonth = computed<Date>(() => 
-  new Date(calendarStore.currentYear, calendarStore.currentMonth, 1)
+const firstDayOfMonth = computed<Date>(
+  () => new Date(calendarStore.currentYear, calendarStore.currentMonth, 1)
 )
 
 const monthYear = computed<string>(() =>

@@ -1,6 +1,5 @@
 <template>
   <div class="calendar">
-    
     <NavigationControls />
 
     <CalendarGrid />
@@ -9,7 +8,11 @@
       :show="calendarStore.showReminderModal"
       :editingReminder="calendarStore.editingReminder"
       :overflowDay="calendarStore.overflowDay"
-      :allReminders="calendarStore.overflowDay ? calendarStore.getAllRemindersForDay(calendarStore.overflowDay) : []"
+      :allReminders="
+        calendarStore.overflowDay
+          ? calendarStore.getAllRemindersForDay(calendarStore.overflowDay)
+          : []
+      "
       @close="calendarStore.closeModal()"
       @save="calendarStore.saveReminder()"
       @delete="calendarStore.deleteReminder"
@@ -25,7 +28,6 @@ import NavigationControls from './NavigationControls.vue'
 import CalendarGrid from './CalendarGrid.vue'
 
 const calendarStore = useCalendarStore()
-
 </script>
 
 <style scoped>
@@ -36,8 +38,8 @@ const calendarStore = useCalendarStore()
   background: #ffffff;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 @media (max-width: 1024px) {

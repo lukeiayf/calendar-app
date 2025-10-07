@@ -1,49 +1,60 @@
 <template>
-    <div class="calendar-grid">
-      <div class="calendar-day calendar-day-header" v-for="day in weekDays" :key="day">
-        {{ day }}
+  <div class="calendar-grid">
+    <div class="calendar-day calendar-day-header" v-for="day in weekDays" :key="day">
+      {{ day }}
+    </div>
+
+    <div
+      v-for="blank in blanks"
+      :key="'blank-' + blank"
+      class="calendar-day calendar-day-blank"
+    ></div>
+
+    <div
+      v-for="date in daysInMonth"
+      :key="date"
+      class="calendar-day calendar-day-large"
+      :class="{ today: isToday(date), weekend: isWeekend(date) }"
+    >
+      <div class="calendar-day-top">
+        <span class="day-number">{{ date }}</span>
+        <button
+          class="add-reminder-btn"
+          @click="calendarStore.openAddReminder(date)"
+          title="Add reminder"
+        >
+          +
+        </button>
       </div>
-      <div
-        v-for="blank in blanks"
-        :key="'blank-' + blank"
-        class="calendar-day calendar-day-blank"
-      ></div>
-      <div
-        v-for="date in daysInMonth"
-        :key="date"
-        class="calendar-day calendar-day-large"
-        :class="{ today: isToday(date), weekend: isWeekend(date) }"
-      >
-        <div class="calendar-day-top">
-          <span class="day-number">{{ date }}</span>
-          <button class="add-reminder-btn" @click="calendarStore.openAddReminder(date)" title="Add reminder">
-            +
-          </button>
+      <div class="reminders-list">
+        <div
+          v-for="reminder in calendarStore
+            .getRemindersForDay(date)
+            .slice(0, calendarStore.MAX_VISIBLE_REMINDERS)"
+          :key="reminder.id"
+          class="reminder"
+          :style="{ background: reminder.color }"
+          @click="calendarStore.openEditReminder(reminder)"
+        >
+          <div class="reminder-header">
+            <span class="reminder-time">{{ reminder.time }}</span>
+            <span class="reminder-city">{{ reminder.city }}</span>
+          </div>
+          <div class="reminder-text">{{ reminder.text }}</div>
         </div>
-        <div class="reminders-list">
-          <div
-            v-for="reminder in calendarStore.getRemindersForDay(date).slice(0, calendarStore.MAX_VISIBLE_REMINDERS)"
-            :key="reminder.id"
-            class="reminder"
-            :style="{ background: reminder.color }"
-            @click="calendarStore.openEditReminder(reminder)"
-          >
-            <div class="reminder-header">
-              <span class="reminder-time">{{ reminder.time }}</span>
-              <span class="reminder-city">{{ reminder.city }}</span>
-            </div>
-            <div class="reminder-text">{{ reminder.text }}</div>
-          </div>
-          <div
-            v-if="calendarStore.getRemindersForDay(date).length > calendarStore.MAX_VISIBLE_REMINDERS"
-            class="reminder-overflow"
-            @click="calendarStore.openAllReminders(date)"
-          >
-            +{{ calendarStore.getRemindersForDay(date).length - calendarStore.MAX_VISIBLE_REMINDERS }} more
-          </div>
+        <div
+          v-if="calendarStore.getRemindersForDay(date).length > calendarStore.MAX_VISIBLE_REMINDERS"
+          class="reminder-overflow"
+          @click="calendarStore.openAllReminders(date)"
+        >
+          +{{
+            calendarStore.getRemindersForDay(date).length - calendarStore.MAX_VISIBLE_REMINDERS
+          }}
+          more
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -55,12 +66,12 @@ const calendarStore = useCalendarStore()
 const weekDays: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const today = new Date()
 
-const firstDayOfMonth = computed<Date>(() => 
-  new Date(calendarStore.currentYear, calendarStore.currentMonth, 1)
+const firstDayOfMonth = computed<Date>(
+  () => new Date(calendarStore.currentYear, calendarStore.currentMonth, 1)
 )
 
-const lastDayOfMonth = computed<Date>(() => 
-  new Date(calendarStore.currentYear, calendarStore.currentMonth + 1, 0)
+const lastDayOfMonth = computed<Date>(
+  () => new Date(calendarStore.currentYear, calendarStore.currentMonth + 1, 0)
 )
 
 const daysInMonth = computed<number[]>(() =>

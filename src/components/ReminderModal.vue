@@ -5,15 +5,11 @@
         <h3>{{ editingReminder.id ? 'Edit Reminder' : 'Add New Reminder' }}</h3>
         <form @submit.prevent="$emit('save')">
           <div class="form-group">
-            <label for="reminder-time">
-              Time
-            </label>
+            <label for="reminder-time"> Time </label>
             <input id="reminder-time" type="time" v-model="editingReminder.time" required />
           </div>
           <div class="form-group">
-            <label for="reminder-city">
-              City
-            </label>
+            <label for="reminder-city"> City </label>
             <input
               id="reminder-city"
               type="text"
@@ -23,15 +19,11 @@
             />
           </div>
           <div class="form-group">
-            <label for="reminder-color">
-              Color
-            </label>
+            <label for="reminder-color"> Color </label>
             <input id="reminder-color" type="color" v-model="editingReminder.color" />
           </div>
           <div class="form-group">
-            <label for="reminder-text">
-              Description
-            </label>
+            <label for="reminder-text"> Description </label>
             <input
               id="reminder-text"
               type="text"
