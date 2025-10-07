@@ -2,11 +2,11 @@
   <div class="calendar">
     
     <div class="calendar-header">
-      <button @click="prevMonth" class="nav-btn" aria-label="Previous Month">
+      <button @click="calendarStore.prevMonth()" class="nav-btn" aria-label="Previous Month">
         <
       </button>
       <h2 class="calendar-title">{{ monthYear }}</h2>
-      <button @click="nextMonth" class="nav-btn" aria-label="Next Month">
+      <button @click="calendarStore.nextMonth()" class="nav-btn" aria-label="Next Month">
         >
       </button>
     </div>
@@ -28,17 +28,17 @@
       >
         <div class="calendar-day-top">
           <span class="day-number">{{ date }}</span>
-          <button class="add-reminder-btn" @click="openAddReminder(date)" title="Add reminder">
+          <button class="add-reminder-btn" @click="calendarStore.openAddReminder(date)" title="Add reminder">
             +
           </button>
         </div>
         <div class="reminders-list">
           <div
-            v-for="reminder in remindersForDay(date).slice(0, MAX_VISIBLE_REMINDERS)"
+            v-for="reminder in calendarStore.getRemindersForDay(date).slice(0, calendarStore.MAX_VISIBLE_REMINDERS)"
             :key="reminder.id"
             class="reminder"
             :style="{ background: reminder.color }"
-            @click="openEditReminder(reminder)"
+            @click="calendarStore.openEditReminder(reminder)"
           >
             <div class="reminder-header">
               <span class="reminder-time">{{ reminder.time }}</span>
@@ -47,11 +47,11 @@
             <div class="reminder-text">{{ reminder.text }}</div>
           </div>
           <div
-            v-if="remindersForDay(date).length > MAX_VISIBLE_REMINDERS"
+            v-if="calendarStore.getRemindersForDay(date).length > calendarStore.MAX_VISIBLE_REMINDERS"
             class="reminder-overflow"
-            @click="showAllReminders(date)"
+            @click="calendarStore.openAllReminders(date)"
           >
-            +{{ remindersForDay(date).length - MAX_VISIBLE_REMINDERS }} more
+            +{{ calendarStore.getRemindersForDay(date).length - calendarStore.MAX_VISIBLE_REMINDERS }} more
           </div>
         </div>
       </div>
@@ -59,31 +59,38 @@
 
     <!-- Reminder Modal -->
     <ReminderModal
-      :show="showReminderModal"
-      :ingReminder="ingReminder"
-      :overflowDay="overflowDay"
-      :allReminders="overflowDay ? allRemindersForDay(overflowDay) : []"
-      @close="showReminderModal = false"
-      @save="saveReminder"
-      @delete="deleteReminder"
-      @-reminder="openEditReminder"
+      :show="calendarStore.showReminderModal"
+      :editingReminder="calendarStore.editingReminder"
+      :overflowDay="calendarStore.overflowDay"
+      :allReminders="calendarStore.overflowDay ? calendarStore.getAllRemindersForDay(calendarStore.overflowDay) : []"
+      @close="calendarStore.closeModal()"
+      @save="calendarStore.saveReminder()"
+      @delete="calendarStore.deleteReminder"
+      @edit-reminder="calendarStore.openEditReminder"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, type Ref } from 'vue'
+import { computed } from 'vue'
 import ReminderModal from './ReminderModal.vue'
-import type { IReminder, IReminderDraft } from '../interfaces/IReminder'
+import { useCalendarStore } from '../store/CalendarStore'
 
-const today = new Date()
-const currentMonth = ref<number>(today.getMonth())
-const currentYear = ref<number>(today.getFullYear())
+// Initialize store
+const calendarStore = useCalendarStore()
 
+// Constants
 const weekDays: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const today = new Date()
 
-const firstDayOfMonth = computed<Date>(() => new Date(currentYear.value, currentMonth.value, 1))
-const lastDayOfMonth = computed<Date>(() => new Date(currentYear.value, currentMonth.value + 1, 0))
+// Computed properties for calendar display
+const firstDayOfMonth = computed<Date>(() => 
+  new Date(calendarStore.currentYear, calendarStore.currentMonth, 1)
+)
+
+const lastDayOfMonth = computed<Date>(() => 
+  new Date(calendarStore.currentYear, calendarStore.currentMonth + 1, 0)
+)
 
 const daysInMonth = computed<number[]>(() =>
   Array.from({ length: lastDayOfMonth.value.getDate() }, (_, i) => i + 1)
@@ -95,116 +102,18 @@ const monthYear = computed<string>(() =>
   firstDayOfMonth.value.toLocaleString('default', { month: 'long', year: 'numeric' })
 )
 
-const reminders: Ref<IReminder[]> = ref([])
-
-const showReminderModal = ref<boolean>(false)
-const ingReminder = ref<IReminderDraft | null>(null)
-const selectedDay = ref<number | null>(null)
-const overflowDay = ref<number | null>(null)
-const MAX_VISIBLE_REMINDERS = 2
-
-const formatDate = (year: number, month: number, day: number): string =>
-  `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-
-const createIReminderDraft = (day: number): IReminderDraft => ({
-  id: null,
-  date: formatDate(currentYear.value, currentMonth.value, day),
-  time: '',
-  city: '',
-  color: '#667eea',
-  text: '',
-})
-
+// Helper functions
 function isToday(date: number): boolean {
   return (
     date === today.getDate() &&
-    currentMonth.value === today.getMonth() &&
-    currentYear.value === today.getFullYear()
+    calendarStore.currentMonth === today.getMonth() &&
+    calendarStore.currentYear === today.getFullYear()
   )
 }
 
 function isWeekend(date: number): boolean {
-  const dayOfWeek = new Date(currentYear.value, currentMonth.value, date).getDay();
-  return dayOfWeek === 0 || dayOfWeek === 6;
-}
-
-function prevMonth(): void {
-  if (currentMonth.value === 0) {
-    currentMonth.value = 11
-    currentYear.value--
-  } else {
-    currentMonth.value--
-  }
-}
-
-function nextMonth(): void {
-  if (currentMonth.value === 11) {
-    currentMonth.value = 0
-    currentYear.value++
-  } else {
-    currentMonth.value++
-  }
-}
-
-function openAddReminder(day: number): void {
-  selectedDay.value = day
-  ingReminder.value = createIReminderDraft(day)
-  showReminderModal.value = true
-}
-
-function openEditReminder(reminder: IReminder): void {
-  ingReminder.value = { ...reminder }
-  showReminderModal.value = true
-}
-
-function saveReminder(): void {
-  const draft = ingReminder.value
-  if (!draft) {
-    return
-  }
-
-  const reminderToSave: IReminder = {
-    ...draft,
-    id: draft.id ?? Date.now(),
-  }
-
-  if (draft.id !== null) {
-    const idx = reminders.value.findIndex(r => r.id === draft.id)
-    if (idx !== -1) {
-      reminders.value[idx] = reminderToSave
-    }
-  } else {
-    reminders.value.push(reminderToSave)
-  }
-
-  ingReminder.value = null
-  showReminderModal.value = false
-}
-
-function deleteReminder(id: number): void {
-  reminders.value = reminders.value.filter(r => r.id !== id)
-  showReminderModal.value = false
-}
-
-function remindersForDay(day: number): IReminder[] {
-  const dateStr = formatDate(currentYear.value, currentMonth.value, day)
-  return reminders.value
-    .filter(r => r.date === dateStr)
-    .sort((a, b) => a.time.localeCompare(b.time))
-}
-
-function showAllReminders(day: number): void {
-  overflowDay.value = day
-  selectedDay.value = day
-  showReminderModal.value = true
-  ingReminder.value = null
-}
-
-function allRemindersForDay(day: number): IReminder[] {
-  const dateStr = formatDate(currentYear.value, currentMonth.value, day)
-  return reminders.value
-    .filter(r => r.date === dateStr)
-    .sort((a, b) => a.time.localeCompare(b.time))
+  const dayOfWeek = new Date(calendarStore.currentYear, calendarStore.currentMonth, date).getDay()
+  return dayOfWeek === 0 || dayOfWeek === 6
 }
 </script>
 
@@ -322,7 +231,6 @@ function allRemindersForDay(day: number): IReminder[] {
   border-color: lightgray;
   box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
 }
-
 
 .calendar-day.today .day-number {
   color: #ffffff;
