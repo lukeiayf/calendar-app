@@ -1,14 +1,10 @@
 <template>
   <div class="calendar-grid">
-    <div class="calendar-day calendar-day-header" v-for="day in weekDays" :key="day">
+    <div v-for="day in weekDays" :key="day" class="calendar-day calendar-day-header">
       {{ day }}
     </div>
 
-    <div
-      v-for="blank in blanks"
-      :key="'blank-' + blank"
-      class="calendar-day calendar-day-blank"
-    ></div>
+    <div v-for="blank in blanks" :key="'blank-' + blank" class="calendar-day calendar-day-blank"></div>
 
     <div
       v-for="date in daysInMonth"
@@ -18,14 +14,9 @@
     >
       <div class="calendar-day-top">
         <span class="day-number">{{ date }}</span>
-        <button
-          class="add-reminder-btn"
-          @click="calendarStore.openAddReminder(date)"
-          title="Add reminder"
-        >
-          +
-        </button>
+        <button class="add-reminder-btn" @click="calendarStore.openAddReminder(date)">+</button>
       </div>
+
       <div class="reminders-list">
         <div
           v-for="reminder in calendarStore
@@ -39,17 +30,19 @@
           <div class="reminder-header">
             <span class="reminder-time">{{ reminder.time }}</span>
             <span class="reminder-city">{{ reminder.city }}</span>
+            <span v-if="reminder.weather" class="reminder-weather">
+              {{ getWeatherEmoji(reminder.weather.weatherCode) }} {{ reminder.weather.temperature }}°C
+            </span>
           </div>
           <div class="reminder-text">{{ reminder.text }}</div>
         </div>
+
         <div
           v-if="calendarStore.getRemindersForDay(date).length > calendarStore.MAX_VISIBLE_REMINDERS"
           class="reminder-overflow"
           @click="calendarStore.openAllReminders(date)"
         >
-          +{{
-            calendarStore.getRemindersForDay(date).length - calendarStore.MAX_VISIBLE_REMINDERS
-          }}
+          +{{ calendarStore.getRemindersForDay(date).length - calendarStore.MAX_VISIBLE_REMINDERS }}
           more
         </div>
       </div>
@@ -60,27 +53,29 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useCalendarStore } from '../store/CalendarStore'
+import { getWeatherEmoji } from '../services/WeatherService'
+
+const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const today = new Date()
 
 const calendarStore = useCalendarStore()
 
-const weekDays: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const today = new Date()
+const firstDayOfMonth = computed(() => {
+  return new Date(calendarStore.currentYear, calendarStore.currentMonth, 1)
+})
 
-const firstDayOfMonth = computed<Date>(
-  () => new Date(calendarStore.currentYear, calendarStore.currentMonth, 1)
-)
+const lastDayOfMonth = computed(() => {
+  return new Date(calendarStore.currentYear, calendarStore.currentMonth + 1, 0)
+})
 
-const lastDayOfMonth = computed<Date>(
-  () => new Date(calendarStore.currentYear, calendarStore.currentMonth + 1, 0)
-)
+const daysInMonth = computed(() => {
+  return Array.from({ length: lastDayOfMonth.value.getDate() }, (_, i) => i + 1)
+})
 
-const daysInMonth = computed<number[]>(() =>
-  Array.from({ length: lastDayOfMonth.value.getDate() }, (_, i) => i + 1)
-)
+const blanks = computed(() => {
+  return firstDayOfMonth.value.getDay()
+})
 
-const blanks = computed<number>(() => firstDayOfMonth.value.getDay())
-
-// Helper functions
 function isToday(date: number): boolean {
   return (
     date === today.getDate() &&
@@ -90,8 +85,8 @@ function isToday(date: number): boolean {
 }
 
 function isWeekend(date: number): boolean {
-  const dayOfWeek = new Date(calendarStore.currentYear, calendarStore.currentMonth, date).getDay()
-  return dayOfWeek === 0 || dayOfWeek === 6
+  const day = new Date(calendarStore.currentYear, calendarStore.currentMonth, date).getDay()
+  return day === 0 || day === 6
 }
 </script>
 
@@ -99,108 +94,103 @@ function isWeekend(date: number): boolean {
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  padding: 1.5rem;
-  gap: 12px;
-  background: #f8f9fa;
+  gap: 8px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
 }
 
 .calendar-day {
-  text-align: center;
-  padding: 0.75rem;
-  border-radius: 12px;
-  min-height: 2.5rem;
-  background: #ffffff;
-  position: relative;
-  transition: all 0.2s ease;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .calendar-day-header {
   font-weight: 600;
-  font-size: 0.875rem;
-  color: #6b7280;
-  background: transparent;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  min-height: auto;
-  padding: 0.5rem;
+  color: #64748b;
+  padding: 8px;
+  text-align: center;
+  font-size: 14px;
 }
 
 .calendar-day-large {
-  min-height: 140px;
+  min-height: 120px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  border: 2px solid #e5e7eb;
-  transition: all 0.2s ease;
+  align-items: stretch;
+  background: #f8fafc;
+  transition: all 0.2s;
 }
 
 .calendar-day-large:hover {
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-  transform: translateY(-2px);
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .calendar-day.today {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #ffffff;
-  font-weight: 600;
-  border-color: #667eea;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 2px solid #3b82f6;
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.1),
+    0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .calendar-day.weekend {
-  background: lightgray;
-  color: #ffffff;
-  font-weight: 600;
-  border-color: lightgray;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #fbbf24;
 }
 
 .calendar-day.today .day-number {
-  color: #ffffff;
+  color: #1e40af;
 }
 
 .calendar-day.today .add-reminder-btn {
-  background: rgba(255, 255, 255, 0.25);
+  background: #3b82f6;
   color: white;
 }
 
 .calendar-day.today .add-reminder-btn:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: #2563eb;
 }
 
 .calendar-day-blank {
   background: transparent;
   border: none;
-  pointer-events: none;
 }
 
 .calendar-day-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
 }
 
 .day-number {
-  font-size: 1.125rem;
   font-weight: 600;
-  color: #1f2937;
+  font-size: 16px;
+  color: #1e293b;
 }
 
 .add-reminder-btn {
-  background: #667eea;
-  color: #ffffff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
   border: none;
-  border-radius: 8px;
-  width: 28px;
-  height: 28px;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 18px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
   opacity: 0;
+  transition: all 0.2s;
 }
 
 .calendar-day-large:hover .add-reminder-btn {
@@ -208,7 +198,7 @@ function isWeekend(date: number): boolean {
 }
 
 .add-reminder-btn:hover {
-  background: #5568d3;
+  background: #cbd5e1;
   transform: scale(1.1);
 }
 
@@ -219,96 +209,69 @@ function isWeekend(date: number): boolean {
 .reminders-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   flex: 1;
-  overflow: hidden;
 }
 
 .reminder {
-  color: #ffffff;
-  padding: 8px 10px;
-  border-radius: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 12px;
   cursor: pointer;
-  font-size: 0.813rem;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .reminder:hover {
-  transform: translateX(2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .reminder-header {
   display: flex;
-  justify-content: space-between;
+  gap: 6px;
   align-items: center;
-  margin-bottom: 4px;
-  gap: 8px;
+  margin-bottom: 2px;
+  flex-wrap: wrap;
 }
 
 .reminder-time {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.3px;
+  font-weight: 600;
+  font-size: 11px;
 }
 
 .reminder-city {
-  font-size: 0.7rem;
+  font-size: 11px;
   opacity: 0.9;
+}
+
+.reminder-weather {
+  font-size: 11px;
   font-weight: 500;
+  margin-left: auto;
 }
 
 .reminder-text {
-  font-size: 0.813rem;
-  line-height: 1.3;
+  font-size: 11px;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .reminder-overflow {
-  color: #667eea;
-  background: #eef2ff;
-  border: 1px solid #c7d2fe;
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 0.813rem;
-  font-weight: 600;
-  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 11px;
   text-align: center;
-  transition: all 0.2s ease;
+  background: #e2e8f0;
+  color: #475569;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
 .reminder-overflow:hover {
-  background: #ddd6fe;
-  border-color: #a78bfa;
+  background: #cbd5e1;
   transform: translateY(-1px);
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .calendar-grid {
-    gap: 8px;
-    padding: 1rem;
-  }
-
-  .calendar-day-large {
-    min-height: 120px;
-  }
-}
-
-@media (max-width: 768px) {
-  .calendar-day-large {
-    min-height: 100px;
-  }
-
-  .day-number {
-    font-size: 1rem;
-  }
-
-  .add-reminder-btn {
-    opacity: 1;
-  }
 }
 </style>

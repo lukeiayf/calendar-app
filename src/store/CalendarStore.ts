@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed, type Ref } from 'vue'
 import type { IReminder, IReminderDraft } from '../interfaces/IReminder'
+import { getWeather } from '../services/WeatherService'
 
 export const useCalendarStore = defineStore('calendarStore', () => {
   // State - Reminders
@@ -44,6 +45,7 @@ export const useCalendarStore = defineStore('calendarStore', () => {
     city: '',
     color: '#667eea',
     text: '',
+    weather: null
   })
 
   //Open modal to add a new reminder
@@ -70,11 +72,13 @@ export const useCalendarStore = defineStore('calendarStore', () => {
   }
 
   //Save a reminder (create new or update existing)
-  const saveReminder = (): void => {
+  const saveReminder = async (): Promise<void> => {
     const draft = editingReminder.value
     if (!draft) {
       return
     }
+
+    const weather = await getWeather(draft.city, draft.date)
 
     const reminderToSave: IReminder = {
       ...draft,
@@ -85,11 +89,16 @@ export const useCalendarStore = defineStore('calendarStore', () => {
       // Update existing reminder
       const idx = reminders.value.findIndex(r => r.id === draft.id)
       if (idx !== -1) {
-        reminders.value[idx] = reminderToSave
+        reminders.value[idx] = {...reminderToSave, weather }
       }
     } else {
       // Create new reminder
-      reminders.value.push(reminderToSave)
+      const newReminder: IReminder = {
+          ...reminderToSave,
+          id: Date.now(),
+          weather,
+        } as IReminder
+      reminders.value.push(newReminder)
     }
 
     closeModal()

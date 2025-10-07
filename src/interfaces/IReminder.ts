@@ -1,3 +1,5 @@
+import type { IWeatherData } from "./IWeatherData"
+
 export interface IReminder {
   id: number
   date: string
@@ -5,6 +7,8 @@ export interface IReminder {
   city: string
   color: string
   text: string
+  weather?: IWeatherData | null
+
 }
 
 export type IReminderDraft = Omit<IReminder, 'id'> & { id: number | null }

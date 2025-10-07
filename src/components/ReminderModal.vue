@@ -49,6 +49,8 @@
           </div>
         </form>
       </template>
+
+
       <template v-else>
         <h3>All Reminders - Day {{ overflowDay }}</h3>
         <div class="reminders-modal-list">
@@ -64,6 +66,9 @@
               <span class="reminder-city">{{ reminder.city }}</span>
             </div>
             <div class="reminder-text">{{ reminder.text }}</div>
+            <span v-if="reminder.weather" class="reminder-weather">
+                {{ getWeatherEmoji(reminder.weather.weatherCode) }} {{ reminder.weather.temperature }}°C
+              </span>
           </div>
         </div>
         <div class="modal-actions">
@@ -76,6 +81,7 @@
 
 <script setup lang="ts">
 import type { IReminder, IReminderDraft } from '../interfaces/IReminder'
+import { getWeatherEmoji } from '../services/WeatherService';
 
 withDefaults(
   defineProps<{
