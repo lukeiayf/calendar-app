@@ -60,13 +60,13 @@
     <!-- Reminder Modal -->
     <ReminderModal
       :show="showReminderModal"
-      :editingReminder="editingReminder"
+      :ingReminder="ingReminder"
       :overflowDay="overflowDay"
       :allReminders="overflowDay ? allRemindersForDay(overflowDay) : []"
       @close="showReminderModal = false"
       @save="saveReminder"
       @delete="deleteReminder"
-      @edit-reminder="openEditReminder"
+      @-reminder="openEditReminder"
     />
   </div>
 </template>
@@ -98,7 +98,7 @@ const monthYear = computed<string>(() =>
 const reminders: Ref<IReminder[]> = ref([])
 
 const showReminderModal = ref<boolean>(false)
-const editingReminder = ref<IReminderDraft | null>(null)
+const ingReminder = ref<IReminderDraft | null>(null)
 const selectedDay = ref<number | null>(null)
 const overflowDay = ref<number | null>(null)
 const MAX_VISIBLE_REMINDERS = 2
@@ -148,17 +148,17 @@ function nextMonth(): void {
 
 function openAddReminder(day: number): void {
   selectedDay.value = day
-  editingReminder.value = createIReminderDraft(day)
+  ingReminder.value = createIReminderDraft(day)
   showReminderModal.value = true
 }
 
 function openEditReminder(reminder: IReminder): void {
-  editingReminder.value = { ...reminder }
+  ingReminder.value = { ...reminder }
   showReminderModal.value = true
 }
 
 function saveReminder(): void {
-  const draft = editingReminder.value
+  const draft = ingReminder.value
   if (!draft) {
     return
   }
@@ -177,7 +177,7 @@ function saveReminder(): void {
     reminders.value.push(reminderToSave)
   }
 
-  editingReminder.value = null
+  ingReminder.value = null
   showReminderModal.value = false
 }
 
@@ -197,7 +197,7 @@ function showAllReminders(day: number): void {
   overflowDay.value = day
   selectedDay.value = day
   showReminderModal.value = true
-  editingReminder.value = null
+  ingReminder.value = null
 }
 
 function allRemindersForDay(day: number): IReminder[] {
@@ -456,120 +456,6 @@ function allRemindersForDay(day: number): IReminder[] {
   transform: translateY(-1px);
 }
 
-/* Modal styles moved to ReminderModal.vue */
-
-/* Form Groups */
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: #374151;
-}
-
-.form-group label svg {
-  color: #667eea;
-}
-
-.form-group input[type='time'],
-.form-group input[type='text'],
-.form-group input[type='color'] {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 10px;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-
-.form-group input[type='time']:focus,
-.form-group input[type='text']:focus,
-.form-group input[type='color']:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.form-group input[type='color'] {
-  height: 50px;
-  cursor: pointer;
-}
-
-/* Modal Actions */
-.modal-actions {
-  margin-top: 2rem;
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.modal-actions button {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.938rem;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #ffffff;
-  flex: 1;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-.btn-secondary {
-  background: #f3f4f6;
-  color: #374151;
-}
-
-.btn-secondary:hover {
-  background: #e5e7eb;
-}
-
-.btn-danger {
-  background: #ef4444;
-  color: #ffffff;
-}
-
-.btn-danger:hover {
-  background: #dc2626;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-}
-
-.modal-actions button:active {
-  transform: translateY(0);
-}
-
-/* Reminders Modal List */
-.reminders-modal-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 1.5rem;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.reminder-modal {
-  margin: 0;
-}
-
 /* Responsive Design */
 @media (max-width: 1024px) {
   .calendar {
@@ -594,11 +480,6 @@ function allRemindersForDay(day: number): IReminder[] {
 
   .calendar-title {
     font-size: 1.25rem;
-  }
-
-  .modal {
-    min-width: 90vw;
-    padding: 1.5rem;
   }
 
   .calendar-day-large {
