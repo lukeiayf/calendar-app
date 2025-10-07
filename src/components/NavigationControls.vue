@@ -64,4 +64,14 @@ const monthYear = computed<string>(() =>
 .nav-btn:active {
   transform: scale(0.95);
 }
+
+@media (max-width: 768px) {
+  .calendar-header {
+    padding: 1.5rem;
+  }
+
+  .calendar-title {
+    font-size: 1.25rem;
+  }
+}
 </style>

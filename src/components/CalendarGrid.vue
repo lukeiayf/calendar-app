@@ -85,20 +85,6 @@ function isWeekend(date: number): boolean {
 </script>
 
 <style scoped>
-/* Main Calendar Container */
-.calendar {
-  max-width: 1400px;
-  margin: 2rem auto;
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    sans-serif;
-}
-
-
-/* Calendar Grid */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -107,7 +93,6 @@ function isWeekend(date: number): boolean {
   background: #f8f9fa;
 }
 
-/* Calendar Day Cells */
 .calendar-day {
   text-align: center;
   padding: 0.75rem;
@@ -179,7 +164,6 @@ function isWeekend(date: number): boolean {
   pointer-events: none;
 }
 
-/* Day Top Section */
 .calendar-day-top {
   display: flex;
   justify-content: space-between;
@@ -221,7 +205,6 @@ function isWeekend(date: number): boolean {
   transform: scale(0.95);
 }
 
-/* Reminders List */
 .reminders-list {
   display: flex;
   flex-direction: column;
@@ -294,11 +277,6 @@ function isWeekend(date: number): boolean {
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .calendar {
-    max-width: 100%;
-    margin: 1rem;
-  }
-
   .calendar-grid {
     gap: 8px;
     padding: 1rem;
@@ -310,14 +288,6 @@ function isWeekend(date: number): boolean {
 }
 
 @media (max-width: 768px) {
-  .calendar-header {
-    padding: 1.5rem;
-  }
-
-  .calendar-title {
-    font-size: 1.25rem;
-  }
-
   .calendar-day-large {
     min-height: 100px;
   }
