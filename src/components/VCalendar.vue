@@ -13,6 +13,7 @@
           ? calendarStore.getAllRemindersForDay(calendarStore.overflowDay)
           : []
       "
+      :is-loading="calendarStore.isSavingReminder"
       @close="calendarStore.closeModal()"
       @save="calendarStore.saveReminder()"
       @delete="calendarStore.deleteReminder"

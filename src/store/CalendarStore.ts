@@ -12,6 +12,7 @@ export const useCalendarStore = defineStore('calendarStore', () => {
   const editingReminder = ref<IReminderDraft | null>(null)
   const selectedDay = ref<number | null>(null)
   const overflowDay = ref<number | null>(null)
+  const isSavingReminder = ref<boolean>(false)
 
   // State - Calendar Navigation
   const today = new Date()
@@ -77,31 +78,38 @@ export const useCalendarStore = defineStore('calendarStore', () => {
     if (!draft) {
       return
     }
+    isSavingReminder.value = true
 
-    const weather = await getWeather(draft.city, draft.date)
+    try {
+      const weather = await getWeather(draft.city, draft.date)
 
-    const reminderToSave: IReminder = {
-      ...draft,
-      id: draft.id ?? Date.now(),
-    }
-
-    if (draft.id !== null) {
-      // Update existing reminder
-      const idx = reminders.value.findIndex(r => r.id === draft.id)
-      if (idx !== -1) {
-        reminders.value[idx] = {...reminderToSave, weather }
+      const reminderToSave: IReminder = {
+        ...draft,
+        id: draft.id ?? Date.now(),
       }
-    } else {
-      // Create new reminder
-      const newReminder: IReminder = {
-          ...reminderToSave,
-          id: Date.now(),
-          weather,
-        } as IReminder
-      reminders.value.push(newReminder)
-    }
 
-    closeModal()
+      if (draft.id !== null) {
+        // Update existing reminder
+        const idx = reminders.value.findIndex(r => r.id === draft.id)
+        if (idx !== -1) {
+          reminders.value[idx] = {...reminderToSave, weather }
+        }
+      } else {
+        // Create new reminder
+        const newReminder: IReminder = {
+            ...reminderToSave,
+            id: Date.now(),
+            weather,
+          } as IReminder
+        reminders.value.push(newReminder)
+      }
+
+      closeModal()
+    } catch (error) {
+      console.error('Error saving reminder:', error)
+    } finally {
+      isSavingReminder.value = false
+    }
   }
 
   //Delete a reminder by ID
@@ -157,6 +165,7 @@ export const useCalendarStore = defineStore('calendarStore', () => {
     overflowDay,
     currentMonth,
     currentYear,
+    isSavingReminder,
 
     // Constants
     MAX_VISIBLE_REMINDERS,

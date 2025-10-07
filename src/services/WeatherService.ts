@@ -1,3 +1,4 @@
+import type { IForecastResponse } from "../interfaces/IForecastResponse";
 import type { IWeatherData } from "../interfaces/IWeatherData";
 
 // Cache to avoid repeated lookups
@@ -37,12 +38,12 @@ export async function getWeather(city: string, date: string): Promise<IWeatherDa
     const response = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&daily=temperature_2m_max,weather_code&timezone=auto&start_date=${date}&end_date=${date}`
     )
-    const data = await response.json()
+    const data: IForecastResponse = await response.json()
 
     if (data.daily && data.daily.temperature_2m_max && data.daily.weather_code) {
       return {
-        temperature: Math.round(data.daily.temperature_2m_max[0]),
-        weatherCode: data.daily.weather_code[0],
+        temperature: Math.round(data.daily.temperature_2m_max[0] ?? 0),
+        weatherCode: data.daily.weather_code[0] ?? 49
       }
     }
     return null

@@ -1,13 +1,18 @@
 <template>
-  <div v-if="show" class="modal-overlay" @click.self="$emit('close')">
+  <div v-if="show" class="modal-overlay" @click.self="!isLoading &&$emit('close')">
     <div class="modal">
+
       <template v-if="editingReminder">
+        
         <h3>{{ editingReminder.id ? 'Edit Reminder' : 'Add New Reminder' }}</h3>
+
         <form @submit.prevent="$emit('save')">
+        
           <div class="form-group">
             <label for="reminder-time"> Time </label>
-            <input id="reminder-time" type="time" v-model="editingReminder.time" required />
+            <input id="reminder-time" type="time" :disabled="isLoading" v-model="editingReminder.time" required />
           </div>
+        
           <div class="form-group">
             <label for="reminder-city"> City </label>
             <input
@@ -15,37 +20,45 @@
               type="text"
               v-model="editingReminder.city"
               required
+              :disabled="isLoading"
               placeholder="Enter city name"
             />
           </div>
+        
           <div class="form-group">
             <label for="reminder-color"> Color </label>
-            <input id="reminder-color" type="color" v-model="editingReminder.color" />
+            <input id="reminder-color" :disabled="isLoading" type="color" v-model="editingReminder.color" />
           </div>
+        
           <div class="form-group">
             <label for="reminder-text"> Description </label>
             <input
               id="reminder-text"
               type="text"
               v-model="editingReminder.text"
+              :disabled="isLoading"
               required
-              maxlength="50"
+              maxlength="30"
               placeholder="What's this reminder about?"
             />
           </div>
-          <div class="modal-actions">
-            <button type="submit" class="btn-primary">
-              {{ editingReminder.id ? 'Update' : 'Save' }}
-            </button>
-            <button type="button" class="btn-secondary" @click="$emit('close')">Cancel</button>
-            <button
+        
+          <div v-if="!isLoading" class="modal-actions">
+              <button type="submit" class="btn-primary">
+                {{ editingReminder.id ? 'Update' : 'Save' }}
+              </button>
+              <button type="button" class="btn-secondary" @click="$emit('close')">Cancel</button>
+              <button
               v-if="editingReminder.id"
               type="button"
               class="btn-danger"
               @click="$emit('delete', editingReminder.id)"
-            >
+              >
               Delete
             </button>
+          </div>
+          <div v-else class="spinner-container">
+            <div class="spinner"></div>
           </div>
         </form>
       </template>
@@ -53,7 +66,9 @@
 
       <template v-else>
         <h3>All Reminders - Day {{ overflowDay }}</h3>
+        
         <div class="reminders-modal-list">
+        
           <div
             v-for="reminder in allReminders"
             :key="reminder.id"
@@ -61,16 +76,19 @@
             :style="{ background: reminder.color }"
             @click="$emit('edit-reminder', reminder)"
           >
-            <div class="reminder-header">
+        
+          <div class="reminder-header">
               <span class="reminder-time">{{ reminder.time }}</span>
               <span class="reminder-city">{{ reminder.city }}</span>
-            </div>
+          </div>
+        
             <div class="reminder-text">{{ reminder.text }}</div>
             <span v-if="reminder.weather" class="reminder-weather">
                 {{ getWeatherEmoji(reminder.weather.weatherCode) }} {{ reminder.weather.temperature }}°C
               </span>
           </div>
         </div>
+        
         <div class="modal-actions">
           <button type="button" class="btn-secondary" @click="$emit('close')">Close</button>
         </div>
@@ -89,12 +107,14 @@ withDefaults(
     editingReminder?: IReminderDraft | IReminder | null
     overflowDay?: number | null
     allReminders?: IReminder[]
+    isLoading?: boolean
   }>(),
   {
     show: false,
     editingReminder: null,
     overflowDay: null,
     allReminders: () => [],
+    isLoading: false
   }
 )
 
@@ -197,6 +217,29 @@ defineEmits(['close', 'save', 'delete', 'edit-reminder'])
 .form-group input[type='color'] {
   height: 50px;
   cursor: pointer;
+}
+
+/* Spinner */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Modal Actions */
