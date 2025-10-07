@@ -11,13 +11,18 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useCalendarStore } from '../store/CalendarStore';
 
-defineProps<{
-  monthYear: string;
-  }>()
+const calendarStore = useCalendarStore()
 
-const calendarStore = useCalendarStore();
+const firstDayOfMonth = computed<Date>(() => 
+  new Date(calendarStore.currentYear, calendarStore.currentMonth, 1)
+)
+
+const monthYear = computed<string>(() =>
+  firstDayOfMonth.value.toLocaleString('default', { month: 'long', year: 'numeric' })
+)
 </script>
 
 <style scoped>
