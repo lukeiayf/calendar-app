@@ -1,18 +1,21 @@
 <template>
-  <div v-if="show" class="modal-overlay" @click.self="!isLoading &&$emit('close')">
+  <div v-if="show" class="modal-overlay" @click.self="!isLoading && $emit('close')">
     <div class="modal">
-
       <template v-if="editingReminder">
-        
         <h3>{{ editingReminder.id ? 'Edit Reminder' : 'Add New Reminder' }}</h3>
 
         <form @submit.prevent="$emit('save')">
-        
           <div class="form-group">
             <label for="reminder-time"> Time </label>
-            <input id="reminder-time" type="time" :disabled="isLoading" v-model="editingReminder.time" required />
+            <input
+              id="reminder-time"
+              type="time"
+              :disabled="isLoading"
+              v-model="editingReminder.time"
+              required
+            />
           </div>
-        
+
           <div class="form-group">
             <label for="reminder-city"> City </label>
             <input
@@ -24,12 +27,17 @@
               placeholder="Enter city name"
             />
           </div>
-        
+
           <div class="form-group">
             <label for="reminder-color"> Color </label>
-            <input id="reminder-color" :disabled="isLoading" type="color" v-model="editingReminder.color" />
+            <input
+              id="reminder-color"
+              :disabled="isLoading"
+              type="color"
+              v-model="editingReminder.color"
+            />
           </div>
-        
+
           <div class="form-group">
             <label for="reminder-text"> Description </label>
             <input
@@ -42,18 +50,18 @@
               placeholder="What's this reminder about?"
             />
           </div>
-        
+
           <div v-if="!isLoading" class="modal-actions">
-              <button type="submit" class="btn-primary">
-                {{ editingReminder.id ? 'Update' : 'Save' }}
-              </button>
-              <button type="button" class="btn-secondary" @click="$emit('close')">Cancel</button>
-              <button
+            <button type="submit" class="btn-primary">
+              {{ editingReminder.id ? 'Update' : 'Save' }}
+            </button>
+            <button type="button" class="btn-secondary" @click="$emit('close')">Cancel</button>
+            <button
               v-if="editingReminder.id"
               type="button"
               class="btn-danger"
               @click="$emit('delete', editingReminder.id)"
-              >
+            >
               Delete
             </button>
           </div>
@@ -63,12 +71,10 @@
         </form>
       </template>
 
-
       <template v-else>
         <h3>All Reminders - Day {{ overflowDay }}</h3>
-        
+
         <div class="reminders-modal-list">
-        
           <div
             v-for="reminder in allReminders"
             :key="reminder.id"
@@ -76,19 +82,19 @@
             :style="{ background: reminder.color }"
             @click="$emit('edit-reminder', reminder)"
           >
-        
-          <div class="reminder-header">
+            <div class="reminder-header">
               <span class="reminder-time">{{ reminder.time }}</span>
               <span class="reminder-city">{{ reminder.city }}</span>
-          </div>
-        
+            </div>
+
             <div class="reminder-text">{{ reminder.text }}</div>
             <span v-if="reminder.weather" class="reminder-weather">
-                {{ getWeatherEmoji(reminder.weather.weatherCode) }} {{ reminder.weather.temperature }}°C
-              </span>
+              {{ getWeatherEmoji(reminder.weather.weatherCode) }}
+              {{ reminder.weather.temperature }}°C
+            </span>
           </div>
         </div>
-        
+
         <div class="modal-actions">
           <button type="button" class="btn-secondary" @click="$emit('close')">Close</button>
         </div>
@@ -99,7 +105,7 @@
 
 <script setup lang="ts">
 import type { IReminder, IReminderDraft } from '../interfaces/IReminder'
-import { getWeatherEmoji } from '../services/WeatherService';
+import { getWeatherEmoji } from '../services/WeatherService'
 
 withDefaults(
   defineProps<{
@@ -114,7 +120,7 @@ withDefaults(
     editingReminder: null,
     overflowDay: null,
     allReminders: () => [],
-    isLoading: false
+    isLoading: false,
   }
 )
 

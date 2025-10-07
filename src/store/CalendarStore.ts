@@ -46,7 +46,7 @@ export const useCalendarStore = defineStore('calendarStore', () => {
     city: '',
     color: '#667eea',
     text: '',
-    weather: null
+    weather: null,
   })
 
   //Open modal to add a new reminder
@@ -92,15 +92,15 @@ export const useCalendarStore = defineStore('calendarStore', () => {
         // Update existing reminder
         const idx = reminders.value.findIndex(r => r.id === draft.id)
         if (idx !== -1) {
-          reminders.value[idx] = {...reminderToSave, weather }
+          reminders.value[idx] = { ...reminderToSave, weather }
         }
       } else {
         // Create new reminder
         const newReminder: IReminder = {
-            ...reminderToSave,
-            id: Date.now(),
-            weather,
-          } as IReminder
+          ...reminderToSave,
+          id: Date.now(),
+          weather,
+        } as IReminder
         reminders.value.push(newReminder)
       }
 

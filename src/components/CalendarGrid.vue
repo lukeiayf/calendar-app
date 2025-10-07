@@ -4,7 +4,11 @@
       {{ day }}
     </div>
 
-    <div v-for="blank in blanks" :key="'blank-' + blank" class="calendar-day calendar-day-blank"></div>
+    <div
+      v-for="blank in blanks"
+      :key="'blank-' + blank"
+      class="calendar-day calendar-day-blank"
+    ></div>
 
     <div
       v-for="date in daysInMonth"
@@ -31,7 +35,8 @@
             <span class="reminder-time">{{ reminder.time }}</span>
             <span class="reminder-city">{{ reminder.city }}</span>
             <span v-if="reminder.weather" class="reminder-weather">
-              {{ getWeatherEmoji(reminder.weather.weatherCode) }} {{ reminder.weather.temperature }}°C
+              {{ getWeatherEmoji(reminder.weather.weatherCode) }}
+              {{ reminder.weather.temperature }}°C
             </span>
           </div>
           <div class="reminder-text">{{ reminder.text }}</div>

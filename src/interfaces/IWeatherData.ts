@@ -1,4 +1,4 @@
 export interface IWeatherData {
-  temperature: number
+  temperature: number | null
   weatherCode: number
 }
