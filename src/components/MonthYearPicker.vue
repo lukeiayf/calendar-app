@@ -11,23 +11,15 @@
 
     <div v-if="isOpen" class="picker-dropdown" @click.stop>
       <div class="picker-header">
-        <button 
-          type="button"
-          class="year-nav-btn" 
-          @click="changeYear(-1)"
-          aria-label="Previous year"
-        >
-          ‹
-        </button>
-        <span class="year-display">{{ selectedYear }}</span>
-        <button 
-          type="button"
-          class="year-nav-btn" 
-          @click="changeYear(1)"
-          aria-label="Next year"
-        >
-          ›
-        </button>
+        <input
+          v-model.number="selectedYear"
+          type="number"
+          class="year-input"
+          :min="1900"
+          :max="2100"
+          @keydown.enter="applyYear"
+          aria-label="Year"
+        />
       </div>
 
       <div class="months-grid">
@@ -57,7 +49,6 @@
       </div>
     </div>
 
-    <!-- Backdrop to close picker when clicking outside -->
     <div 
       v-if="isOpen" 
       class="picker-backdrop" 
@@ -67,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps<{
   currentMonth: number
@@ -104,11 +95,14 @@ const closePicker = () => {
   isOpen.value = false
 }
 
-const changeYear = (delta: number) => {
-  selectedYear.value += delta
+const applyYear = () => {
+  // Validate year range
+  if (selectedYear.value < 1900) selectedYear.value = 1900
+  if (selectedYear.value > 2100) selectedYear.value = 2100
 }
 
 const selectMonth = (month: number) => {
+  applyYear() // Ensure year is valid before selecting month
   selectedMonth.value = month
   emit('update:month-year', month, selectedYear.value)
   closePicker()
@@ -119,7 +113,12 @@ const goToToday = () => {
   closePicker()
 }
 
-// Close picker on Escape key
+// Validate year on input change
+watch(selectedYear, (newYear) => {
+  if (newYear < 1900) selectedYear.value = 1900
+  if (newYear > 2100) selectedYear.value = 2100
+})
+
 const handleEscape = (e: KeyboardEvent) => {
   if (e.key === 'Escape' && isOpen.value) {
     closePicker()
@@ -199,40 +198,33 @@ onUnmounted(() => {
 }
 
 .picker-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 2px solid #f0f0f0;
 }
 
-.year-display {
+.year-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
   font-size: 18px;
   font-weight: 600;
-  color: #333;
-  min-width: 80px;
   text-align: center;
-}
-
-.year-nav-btn {
-  background: #f5f5f5;
-  border: none;
-  border-radius: 8px;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 20px;
-  color: #666;
+  color: #333;
   transition: all 0.2s ease;
 }
 
-.year-nav-btn:hover {
-  background: #e0e0e0;
-  color: #333;
+.year-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.year-input::-webkit-inner-spin-button,
+.year-input::-webkit-outer-spin-button {
+  opacity: 1;
+  height: 30px;
 }
 
 .months-grid {
