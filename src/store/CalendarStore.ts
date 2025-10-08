@@ -118,6 +118,11 @@ export const useCalendarStore = defineStore('calendarStore', () => {
     closeModal()
   }
 
+  const deleteAllRemindersForDay = (day: number): void => {
+    const dateStr = formatDate(currentYear.value, currentMonth.value, day)
+    reminders.value = reminders.value.filter(r => r.date !== dateStr)
+  }
+
   //Close the reminder modal and reset state
   const closeModal = (): void => {
     showReminderModal.value = false
@@ -179,6 +184,7 @@ export const useCalendarStore = defineStore('calendarStore', () => {
     openAllReminders,
     saveReminder,
     deleteReminder,
+    deleteAllRemindersForDay,
     closeModal,
     getAllRemindersForDay,
     prevMonth,

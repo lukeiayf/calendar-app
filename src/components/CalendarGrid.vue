@@ -18,7 +18,12 @@
     >
       <div class="calendar-day-top">
         <span class="day-number">{{ date }}</span>
-        <button class="add-reminder-btn" @click="calendarStore.openAddReminder(date)">+</button>
+        <div class="reminder-buttons">
+          <button v-if="calendarStore.getRemindersForDay(date).length > 0" 
+            class="add-reminder-btn" @click="calendarStore.deleteAllRemindersForDay(date)"
+            title="Delete all reminders for this day">🗑️</button>
+          <button class="add-reminder-btn" @click="calendarStore.openAddReminder(date)">+</button>
+        </div>
       </div>
 
       <div class="reminders-list">
@@ -208,6 +213,12 @@ function isWeekend(date: number): boolean {
 
 .add-reminder-btn:active {
   transform: scale(0.95);
+}
+
+.reminder-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
 }
 
 .reminders-list {
