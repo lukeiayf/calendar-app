@@ -118,6 +118,7 @@ function isWeekend(date: number): boolean {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   overflow: hidden;
+  padding: 0 0 1px 0;
 }
 
 .calendar-day {
