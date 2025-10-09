@@ -96,7 +96,7 @@ describe('calendarStore', () => {
     })
 
     // Edit reminder
-    
+
     store.openEditReminder(store.reminders[0] as IReminder)
     if (store.editingReminder) {
       store.editingReminder.city = 'UpdatedCity'
@@ -115,7 +115,15 @@ describe('calendarStore', () => {
   })
 
   it('deleteReminder removes reminder and closes modal', () => {
-    store.reminders.push({ id: 1, date: '2025-10-10', time: '10:00', city: '', color: '', text: '', weather: null })
+    store.reminders.push({
+      id: 1,
+      date: '2025-10-10',
+      time: '10:00',
+      city: '',
+      color: '',
+      text: '',
+      weather: null,
+    })
     store.showReminderModal = true
 
     store.deleteReminder(1)
@@ -139,7 +147,15 @@ describe('calendarStore', () => {
 
   it('closeModal resets modal state', () => {
     store.showReminderModal = true
-    store.editingReminder = { id: 1, date: '', time: '', city: '', color: '', text: '', weather: null }
+    store.editingReminder = {
+      id: 1,
+      date: '',
+      time: '',
+      city: '',
+      color: '',
+      text: '',
+      weather: null,
+    }
     store.selectedDay = 5
     store.overflowDay = 5
 

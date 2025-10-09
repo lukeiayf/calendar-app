@@ -1,15 +1,12 @@
 <template>
   <div class="calendar-header">
-    <button 
-      @click="calendarStore.prevMonth()" 
-      class="nav-btn" 
-      aria-label="Previous Month"
-    >
+    <button @click="calendarStore.prevMonth()" class="nav-btn" aria-label="Previous Month">
       ‹
     </button>
-    
+
     <div class="header-center">
       <h2 class="calendar-title">{{ monthYear }}</h2>
+      
       <MonthYearPicker
         :current-month="calendarStore.currentMonth"
         :current-year="calendarStore.currentYear"
@@ -17,12 +14,8 @@
         @go-to-today="calendarStore.goToToday()"
       />
     </div>
-    
-    <button 
-      @click="calendarStore.nextMonth()" 
-      class="nav-btn" 
-      aria-label="Next Month"
-    >
+
+    <button @click="calendarStore.nextMonth()" class="nav-btn" aria-label="Next Month">
       ›
     </button>
   </div>

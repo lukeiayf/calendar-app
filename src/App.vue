@@ -7,5 +7,4 @@ import VCalendar from './components/VCalendar.vue'
 </script>
 
 <style scoped>
-/* App-specific styles can go here */
 </style>

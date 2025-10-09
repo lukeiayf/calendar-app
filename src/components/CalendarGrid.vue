@@ -19,9 +19,14 @@
       <div class="calendar-day-top">
         <span class="day-number">{{ date }}</span>
         <div class="reminder-buttons">
-          <button v-if="calendarStore.getRemindersForDay(date).length > 0" 
-            class="add-reminder-btn" @click="calendarStore.deleteAllRemindersForDay(date)"
-            title="Delete all reminders for this day">🗑️</button>
+          <button
+            v-if="calendarStore.getRemindersForDay(date).length > 0"
+            class="add-reminder-btn"
+            @click="calendarStore.deleteAllRemindersForDay(date)"
+            title="Delete all reminders for this day"
+          >
+            🗑️
+          </button>
           <button class="add-reminder-btn" @click="calendarStore.openAddReminder(date)">+</button>
         </div>
       </div>
@@ -37,13 +42,16 @@
           @click="calendarStore.openEditReminder(reminder)"
         >
           <div class="reminder-header">
+            
             <span class="reminder-time">{{ reminder.time }}</span>
             <span class="reminder-city">{{ reminder.city }}</span>
             <span v-if="reminder.weather" class="reminder-weather">
               {{ getWeatherEmoji(reminder.weather.weatherCode) }}
               {{ reminder.weather.temperature }}°C
             </span>
+          
           </div>
+          
           <div class="reminder-text">{{ reminder.text }}</div>
         </div>
 
@@ -61,43 +69,43 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useCalendarStore } from '../store/CalendarStore';
-import { getWeatherEmoji } from '../services/WeatherService';
+import { computed } from 'vue'
+import { useCalendarStore } from '../store/CalendarStore'
+import { getWeatherEmoji } from '../services/WeatherService'
 
-const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-const today = new Date();
+const today = new Date()
 
-const calendarStore = useCalendarStore();
+const calendarStore = useCalendarStore()
 
 const firstDayOfMonth = computed(() => {
-  return new Date(calendarStore.currentYear, calendarStore.currentMonth, 1);
-});
+  return new Date(calendarStore.currentYear, calendarStore.currentMonth, 1)
+})
 
 const lastDayOfMonth = computed(() => {
-  return new Date(calendarStore.currentYear, calendarStore.currentMonth + 1, 0);
-});
+  return new Date(calendarStore.currentYear, calendarStore.currentMonth + 1, 0)
+})
 
 const daysInMonth = computed(() => {
-  return Array.from({ length: lastDayOfMonth.value.getDate() }, (_, i) => i + 1);
-});
+  return Array.from({ length: lastDayOfMonth.value.getDate() }, (_, i) => i + 1)
+})
 
 const blanks = computed(() => {
-  return firstDayOfMonth.value.getDay();
-});
+  return firstDayOfMonth.value.getDay()
+})
 
 function isToday(date: number): boolean {
   return (
     date === today.getDate() &&
     calendarStore.currentMonth === today.getMonth() &&
     calendarStore.currentYear === today.getFullYear()
-  );
+  )
 }
 
 function isWeekend(date: number): boolean {
-  const day = new Date(calendarStore.currentYear, calendarStore.currentMonth, date).getDay();
-  return day === 0 || day === 6;
+  const day = new Date(calendarStore.currentYear, calendarStore.currentMonth, date).getDay()
+  return day === 0 || day === 6
 }
 </script>
 

@@ -52,14 +52,14 @@ export const useCalendarStore = defineStore('calendarStore', () => {
   //Open modal to add a new reminder
   const openAddReminder = (day: number): void => {
     selectedDay.value = day
-   editingReminder.value = createReminderDraft(day)
+    editingReminder.value = createReminderDraft(day)
     overflowDay.value = null
     showReminderModal.value = true
   }
 
   //Open modal to  an existing reminder
   const openEditReminder = (reminder: IReminder): void => {
-   editingReminder.value = { ...reminder }
+    editingReminder.value = { ...reminder }
     overflowDay.value = null
     showReminderModal.value = true
   }
@@ -68,13 +68,13 @@ export const useCalendarStore = defineStore('calendarStore', () => {
   const openAllReminders = (day: number): void => {
     overflowDay.value = day
     selectedDay.value = day
-   editingReminder.value = null
+    editingReminder.value = null
     showReminderModal.value = true
   }
 
   //Save a reminder (create new or update existing)
   const saveReminder = async (): Promise<void> => {
-    const draft =editingReminder.value
+    const draft = editingReminder.value
     if (!draft) {
       return
     }
@@ -126,7 +126,7 @@ export const useCalendarStore = defineStore('calendarStore', () => {
   //Close the reminder modal and reset state
   const closeModal = (): void => {
     showReminderModal.value = false
-   editingReminder.value = null
+    editingReminder.value = null
     selectedDay.value = null
     overflowDay.value = null
   }
@@ -178,7 +178,7 @@ export const useCalendarStore = defineStore('calendarStore', () => {
     // State
     reminders,
     showReminderModal,
-   editingReminder,
+    editingReminder,
     selectedDay,
     overflowDay,
     currentMonth,

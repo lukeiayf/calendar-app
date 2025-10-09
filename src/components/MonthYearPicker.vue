@@ -1,8 +1,8 @@
 <template>
   <div class="month-year-picker">
-    <button 
+    <button
       type="button"
-      class="picker-trigger" 
+      class="picker-trigger"
       @click="togglePicker"
       :aria-label="isOpen ? 'Close date picker' : 'Open date picker'"
     >
@@ -28,9 +28,9 @@
           :key="index"
           type="button"
           class="month-btn"
-          :class="{ 
+          :class="{
             active: index === selectedMonth && selectedYear === currentYear,
-            today: index === todayMonth && selectedYear === todayYear
+            today: index === todayMonth && selectedYear === todayYear,
           }"
           @click="selectMonth(index)"
         >
@@ -39,21 +39,11 @@
       </div>
 
       <div class="picker-footer">
-        <button 
-          type="button"
-          class="today-btn" 
-          @click="goToToday"
-        >
-          Today
-        </button>
+        <button type="button" class="today-btn" @click="goToToday">Today</button>
       </div>
     </div>
 
-    <div 
-      v-if="isOpen" 
-      class="picker-backdrop" 
-      @click="closePicker"
-    ></div>
+    <div v-if="isOpen" class="picker-backdrop" @click="closePicker"></div>
   </div>
 </template>
 
@@ -74,10 +64,7 @@ const isOpen = ref(false)
 const selectedMonth = ref(props.currentMonth)
 const selectedYear = ref(props.currentYear)
 
-const months = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-]
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 const today = new Date()
 const todayMonth = today.getMonth()
@@ -114,7 +101,7 @@ const goToToday = () => {
 }
 
 // Validate year on input change
-watch(selectedYear, (newYear) => {
+watch(selectedYear, newYear => {
   if (newYear < 1900) selectedYear.value = 1900
   if (newYear > 2100) selectedYear.value = 2100
 })
